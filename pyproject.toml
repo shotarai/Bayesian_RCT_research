@@ -1,0 +1,36 @@
+[project]
+name = "bayesian-rct-research"
+version = "0.1.0"
+description = "LLM Prior Elicitation for Bayesian RCT Analysis"
+authors = [
+    {name = "Arai Shouta", email = "araishouta@example.com"}
+]
+dependencies = [
+    "openai>=1.0.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.6.0",
+    "seaborn>=0.12.0",
+    "python-dotenv>=1.1.0",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.0.0",
+    "mypy>=1.0.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
