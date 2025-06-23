@@ -1,7 +1,7 @@
 # filepath: scripts/check_setup.py
 """
 Setup Verification Script
-セットアップ確認スクリプト
+Setup verification script
 """
 
 import sys
@@ -10,7 +10,7 @@ import subprocess
 
 
 def check_python_version():
-    """Python バージョンの確認"""
+    """Check Python version"""
     version = sys.version_info
     print(f"Python version: {version.major}.{version.minor}.{version.micro}")
     
@@ -23,7 +23,7 @@ def check_python_version():
 
 
 def check_rye():
-    """Rye の確認"""
+    """Check Rye installation"""
     try:
         result = subprocess.run(['rye', '--version'], capture_output=True, text=True)
         if result.returncode == 0:
@@ -38,7 +38,7 @@ def check_rye():
 
 
 def check_dependencies():
-    """依存関係の確認"""
+    """Check dependencies"""
     required_packages = [
         'pandas', 'numpy', 'matplotlib', 'seaborn', 'openai'
     ]
@@ -56,14 +56,14 @@ def check_dependencies():
 
 
 def check_data_files():
-    """データファイルの確認"""
+    """Check data files"""
     script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_path = os.path.join(script_dir, 'data', 'toenail.txt')
     
     if os.path.exists(data_path):
         print("✅ Toenail data file found")
         
-        # ファイルサイズ確認
+        # Check file size
         size = os.path.getsize(data_path)
         print(f"   File size: {size:,} bytes")
         
@@ -74,7 +74,7 @@ def check_data_files():
 
 
 def check_modules():
-    """ローカルモジュールの確認"""
+    """Check local modules"""
     try:
         script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         sys.path.append(script_dir)
@@ -93,7 +93,7 @@ def check_modules():
 
 
 def main():
-    """メイン確認処理"""
+    """Main verification process"""
     print("="*50)
     print("🔍 BAYESIAN RCT RESEARCH - SETUP CHECK")
     print("="*50)

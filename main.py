@@ -1,5 +1,5 @@
 # Complete LLM Prior Elicitation System - Modularized Version
-# モジュール化されたLLM事前分布設定システム
+# Modularized LLM Prior Distribution Elicitation System
 
 import os
 import logging
@@ -7,14 +7,14 @@ from datetime import datetime
 from typing import Optional
 from dotenv import load_dotenv
 
-# .envファイルを読み込み
+# Load .env file
 load_dotenv()
 from dotenv import load_dotenv
 
-# .envファイルを読み込み
+# Load .env file
 load_dotenv()
 
-# ローカルモジュールのインポート
+# Import local modules
 from src import (
     comparative_analysis_setup,
     compare_prior_specifications,
@@ -26,39 +26,39 @@ from src import (
     create_output_directory_structure
 )
 
-# ロギング設定
+# Logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
 def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = True):
     """
-    完全な比較分析を実行（ファイル出力機能付き）
+    Execute complete comparative analysis with file output functionality
     
     Parameters:
     -----------
     api_key : Optional[str]
-        OpenAI APIキー (Noneの場合はMock LLM使用)
+        OpenAI API key (uses Mock LLM if None)
     save_results : bool
-        結果をファイルに保存するかどうか
+        Whether to save results to files
         
     Returns:
     --------
     dict
-        分析結果辞書
+        Analysis results dictionary
     """
     print("="*80)
     print("COMPLETE BAYESIAN RCT PRIOR ANALYSIS")
     print("LLM vs Historical vs Uninformative Priors")
     print("="*80)
     
-    # データ読み込み
+    # Load data
     toenail_data = load_actual_toenail_data()
     
-    # 比較セットアップ
+    # Setup comparison
     comparison_setup, llm_priors = comparative_analysis_setup(api_key)
     
-    # 事前分布比較
+    # Prior distributions comparison
     print("\n📊 PRIOR DISTRIBUTIONS COMPARISON:")
     print("-" * 60)
     for prior_type, priors in comparison_setup.items():
@@ -67,7 +67,7 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
             if isinstance(spec, dict) and 'mu' in spec and 'sigma' in spec:
                 print(f"  {param}: μ={spec['mu']:.3f}, σ={spec['sigma']:.3f}")
     
-    # サンプルサイズ削減効果
+    # Sample size reduction effects
     sample_size_benefits = calculate_sample_size_benefits(comparison_setup)
     
     print("\n💡 SAMPLE SIZE REDUCTION ANALYSIS:")
@@ -79,7 +79,7 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
         print(f"  Potential patients saved: {benefit.patient_savings}")
         print(f"  Improved power: {benefit.power:.3f}")
     
-    # LLM vs 歴史的事前分布の比較
+    # LLM vs historical priors comparison
     if 'historical_fixed' in comparison_setup and 'llm_expert' in comparison_setup:
         llm_vs_historical = compare_prior_specifications(
             comparison_setup['llm_expert'],
@@ -100,7 +100,7 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
     print("2. Sample size reductions possible with informed priors")
     print("3. Patient savings achievable through better prior knowledge")
     
-    # 結果データ構造の作成
+    # Create results data structure
     results = {
         'comparison_setup': comparison_setup,
         'sample_size_benefits': [
@@ -131,20 +131,20 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
         'api_key_used': api_key is not None
     }
     
-    # ファイル出力
+    # File output
     if save_results:
         try:
             print("\n💾 Saving analysis results...")
             
-            # JSON詳細結果保存
+            # JSON detailed results save
             json_path = save_analysis_results(results)
             print(f"📄 Detailed results: {json_path}")
             
-            # Markdownサマリー保存
+            # Markdown summary save
             summary_path = save_summary_report(results)
             print(f"📋 Summary report: {summary_path}")
             
-            # 事前分布比較のCSV保存
+            # Prior distribution comparison CSV save
             prior_comparisons = compare_prior_specifications(
                 comparison_setup.get('llm_expert', {}),
                 comparison_setup.get('historical_fixed', {})
@@ -164,9 +164,9 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
 
 def main():
     """
-    メイン実行関数
+    Main execution function
     """
-    # API キーの取得（環境変数から）
+    # Get API key from environment variables
     api_key = os.getenv('OPENAI_API_KEY')
     
     if not api_key:
@@ -174,7 +174,7 @@ def main():
         print("To use real LLM, set: export OPENAI_API_KEY='your-api-key'")
         print()
     
-    # 完全な比較分析実行
+    # Execute complete comparative analysis
     print("🚀 Starting complete Bayesian RCT prior analysis...")
     results = run_complete_analysis(api_key)
     

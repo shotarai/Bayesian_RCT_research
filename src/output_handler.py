@@ -1,7 +1,7 @@
 # filepath: src/output_handler.py
 """
 Output Handler for Bayesian RCT Analysis Results
-分析結果の出力・保存機能
+Output and save functionality for analysis results
 """
 
 import json
@@ -15,32 +15,32 @@ logger = logging.getLogger(__name__)
 
 def save_analysis_results(results: Dict[str, Any], output_dir: str = "results") -> str:
     """
-    分析結果をJSONファイルに保存
+    Save analysis results to JSON file
     
     Parameters:
     -----------
     results : Dict[str, Any]
-        分析結果データ
+        Analysis results data
     output_dir : str
-        出力ディレクトリパス
+        Output directory path
         
     Returns:
     --------
     str
-        保存されたファイルのパス
+        Path to the saved file
     """
-    # 出力ディレクトリ作成
+    # Create output directory
     os.makedirs(output_dir, exist_ok=True)
     
-    # タイムスタンプ付きファイル名
+    # Timestamped filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"bayesian_rct_analysis_{timestamp}.json"
     filepath = os.path.join(output_dir, filename)
     
-    # シリアライズ可能な形式に変換
+    # Convert to serializable format
     serializable_results = make_serializable(results)
     
-    # 結果保存
+    # Save results
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(serializable_results, f, indent=2, ensure_ascii=False)
     
@@ -50,19 +50,19 @@ def save_analysis_results(results: Dict[str, Any], output_dir: str = "results") 
 
 def save_summary_report(results: Dict[str, Any], output_dir: str = "results") -> str:
     """
-    サマリーレポートをMarkdownファイルに保存
+    Save summary report to Markdown file
     
     Parameters:
     -----------
     results : Dict[str, Any]
-        分析結果データ
+        Analysis results data
     output_dir : str
-        出力ディレクトリパス
+        Output directory path
         
     Returns:
     --------
     str
-        保存されたファイルのパス
+        Path to the saved file
     """
     os.makedirs(output_dir, exist_ok=True)
     
@@ -75,11 +75,11 @@ def save_summary_report(results: Dict[str, Any], output_dir: str = "results") ->
         f.write(f"**Generated**: {datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')}\n")
         f.write(f"**API Used**: {'Real LLM (GPT-4)' if results.get('api_key_used', False) else 'Mock LLM'}\n\n")
         
-        # 研究目標と答え
+        # Research goal and answer
         f.write("## 🎯 Research Question\n")
         f.write("**\"How many patients can we save with better priors?\"**\n\n")
         
-        # 患者節約効果
+        # Patient savings effects
         if 'sample_size_benefits' in results:
             f.write("## 💡 Patient Savings Analysis\n\n")
             for benefit in results['sample_size_benefits']:
@@ -93,7 +93,7 @@ def save_summary_report(results: Dict[str, Any], output_dir: str = "results") ->
                 f.write(f"- **Sample size reduction**: {sample_reduction}%\n")
                 f.write(f"- **Effective sample size gain**: {effective_gain}x\n\n")
         
-        # 事前分布比較
+        # Prior distributions comparison
         if 'comparison_setup' in results:
             f.write("## 📊 Prior Distributions Comparison\n\n")
             for prior_type, priors in results['comparison_setup'].items():
@@ -106,7 +106,7 @@ def save_summary_report(results: Dict[str, Any], output_dir: str = "results") ->
                             f.write(f"- **{param}**: α={spec['alpha']}, β={spec['beta']} (Inverse Gamma)\n")
                 f.write("\n")
         
-        # LLM事前分布詳細
+        # LLM prior distribution details
         if 'llm_priors' in results and results['llm_priors']:
             f.write("## 🤖 LLM-Elicited Priors Details\n\n")
             for prior in results['llm_priors']:
@@ -117,7 +117,7 @@ def save_summary_report(results: Dict[str, Any], output_dir: str = "results") ->
                 f.write(f"- **Confidence**: {prior.get('confidence', 'N/A')}\n")
                 f.write(f"- **Rationale**: {prior.get('rationale', 'N/A')}\n\n")
         
-        # データ統計
+        # Data statistics
         if 'data_stats' in results:
             f.write("## 📈 Dataset Statistics\n\n")
             stats = results['data_stats']
@@ -125,7 +125,7 @@ def save_summary_report(results: Dict[str, Any], output_dir: str = "results") ->
             f.write(f"- **Unique patients**: {stats.get('unique_patients', 'N/A')}\n")
             f.write(f"- **Treatment groups**: {stats.get('treatment_groups', 'N/A')}\n")
         
-        # 結論
+        # Conclusion
         f.write("## ✅ Conclusion\n\n")
         f.write("This analysis demonstrates that informed Bayesian priors can significantly reduce ")
         f.write("the number of patients required for clinical trials while maintaining statistical rigor. ")
@@ -141,7 +141,7 @@ def save_summary_report(results: Dict[str, Any], output_dir: str = "results") ->
 
 def save_prior_comparison_csv(comparisons: List[Dict], output_dir: str = "results") -> str:
     """
-    事前分布比較をCSV形式で保存
+    Save prior distribution comparison in CSV format
     """
     import csv
     
@@ -174,7 +174,7 @@ def save_prior_comparison_csv(comparisons: List[Dict], output_dir: str = "result
 
 def make_serializable(obj: Any) -> Any:
     """
-    オブジェクトをJSON シリアライズ可能な形式に変換
+    Convert object to JSON serializable format
     """
     if hasattr(obj, '__dict__'):
         return obj.__dict__
@@ -190,12 +190,12 @@ def make_serializable(obj: Any) -> Any:
 
 def create_output_directory_structure(base_dir: str = "results") -> Dict[str, str]:
     """
-    出力ディレクトリ構造を作成
+    Create output directory structure
     
     Returns:
     --------
     Dict[str, str]
-        作成されたディレクトリパスの辞書
+        Dictionary of created directory paths
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     

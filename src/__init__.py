@@ -1,7 +1,7 @@
 # filepath: src/__init__.py
 """
 Bayesian RCT Research Package
-ベイズRCT研究パッケージ
+Bayesian RCT Research Package
 """
 
 from .data_models import (

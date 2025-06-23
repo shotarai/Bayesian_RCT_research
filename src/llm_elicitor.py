@@ -1,7 +1,7 @@
 # filepath: src/llm_elicitor.py
 """
 LLM Prior Elicitation Classes
-LLMベースの事前分布設定システム
+LLM-based prior distribution elicitation system
 """
 
 import os
@@ -22,22 +22,22 @@ logger = logging.getLogger(__name__)
 
 class ProductionLLMPriorElicitor:
     """
-    本格的なLLM事前分布設定システム
-    OpenAI GPT-4.1 API を使用
+    Production-level LLM prior distribution elicitation system
+    Uses OpenAI GPT-4.1 API
     """
     
     def __init__(self, api_key: str, model: str = "gpt-4.1", temperature: float = 0.2):
         """
-        初期化
+        Initialize the LLM prior elicitor
         
         Parameters:
         -----------
         api_key : str
-            OpenAI API キー (必須)
+            OpenAI API key (required)
         model : str
-            使用するモデル（gpt-4.1推奨）
+            Model to use (gpt-4.1 recommended)
         temperature : float
-            応答の一貫性制御（0.1-0.3推奨）
+            Response consistency control (0.1-0.3 recommended)
         """
         if not api_key:
             raise ValueError("OpenAI API key is required for production use")
@@ -47,7 +47,7 @@ class ProductionLLMPriorElicitor:
         self.temperature = temperature
         self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # API接続テスト
+        # Test API connection
         self._test_api_connection()
         
         logger.info(f"✓ LLM Prior Elicitor initialized successfully")
@@ -56,7 +56,7 @@ class ProductionLLMPriorElicitor:
         logger.info(f"  Session ID: {self.session_id}")
     
     def _test_api_connection(self):
-        """API接続テスト"""
+        """Test API connection"""
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
@@ -76,7 +76,7 @@ class ProductionLLMPriorElicitor:
                               clinical_context: str,
                               additional_context: Optional[str] = None) -> List[LLMPriorSpecification]:
         """
-        LLMから臨床的事前分布を設定
+        Elicit clinical prior distributions from LLM
         """
         logger.info("🔬 Starting LLM-based prior elicitation...")
         logger.info(f"  Context: {clinical_context}")
@@ -96,7 +96,7 @@ class ProductionLLMPriorElicitor:
                              outcome_measure: str, clinical_context: str,
                              additional_context: Optional[str] = None) -> str:
         """
-        専門家相談用の詳細プロンプト作成
+        Create detailed prompt for expert consultation
         """
         additional_info = f"\n\nADDITIONAL CLINICAL INFORMATION:\n{additional_context}" if additional_context else ""
         
@@ -127,7 +127,7 @@ Please provide expert prior beliefs for each parameter in strict JSON format:
     
     def _get_llm_response(self, prompt: str, max_retries: int = 3) -> List[LLMPriorSpecification]:
         """
-        実際のLLM API呼び出し（エラーハンドリング付き）
+        Actual LLM API call with error handling
         """
         for attempt in range(max_retries):
             try:
@@ -145,7 +145,7 @@ Please provide expert prior beliefs for each parameter in strict JSON format:
                 
                 content = response.choices[0].message.content.strip()
                 
-                # JSON抽出
+                # Extract JSON
                 if "```json" in content:
                     json_start = content.find("```json") + 7
                     json_end = content.find("```", json_start)
@@ -157,7 +157,7 @@ Please provide expert prior beliefs for each parameter in strict JSON format:
                 
                 llm_data = json.loads(content)
                 
-                # データ変換
+                # Convert data
                 priors = []
                 expert_assessment = llm_data.get("expert_assessment", {})
                 
@@ -194,7 +194,7 @@ Please provide expert prior beliefs for each parameter in strict JSON format:
     
     def export_priors_for_analysis(self, priors: List[LLMPriorSpecification]) -> Dict:
         """
-        ベイズ解析用の事前分布仕様をエクスポート
+        Export prior distribution specifications for Bayesian analysis
         """
         exported_priors = {}
         
@@ -232,7 +232,7 @@ Please provide expert prior beliefs for each parameter in strict JSON format:
     
     def save_session_data(self, priors: List[LLMPriorSpecification], filename: Optional[str] = None) -> str:
         """
-        セッションデータの保存
+        Save session data
         """
         if filename is None:
             filename = f"llm_priors_session_{self.session_id}.json"
@@ -254,13 +254,13 @@ Please provide expert prior beliefs for each parameter in strict JSON format:
 
 class MockLLMPriorElicitor:
     """
-    テスト用のモックLLMエリシター
-    OpenAI APIキーが利用できない場合のテスト用
+    Mock LLM elicitor for testing
+    For testing when OpenAI API key is not available
     """
     
     def __init__(self, model: str = "mock-gpt-4.1", temperature: float = 0.2):
         """
-        初期化
+        Initialize mock elicitor
         """
         self.model = model
         self.temperature = temperature
@@ -277,27 +277,27 @@ class MockLLMPriorElicitor:
                               clinical_context: str,
                               additional_context: Optional[str] = None) -> List[LLMPriorSpecification]:
         """
-        モック版のLLM事前分布設定
-        Study2歴史的研究データと実際のtoenailデータセット統計に基づく臨床的合理的な事前分布
+        Mock version of LLM prior distribution elicitation
+        Clinically reasonable priors based on Study2 historical research data and actual toenail dataset statistics
         
-        データ根拠:
-        - 実測ベースライン平均: 1.89mm (Study2では2.5mm想定)
-        - 実測月間成長率: 0.555mm/月 (Itraconazole: 0.558, Terbinafine: 0.600)
-        - 治療優位性: 平均0.35mm/月 (12ヶ月で0.771mm差)
-        - 測定誤差: 全体標準偏差4.39mm
+        Data evidence:
+        - Actual baseline mean: 1.89mm (Study2 assumed 2.5mm)
+        - Actual monthly growth rate: 0.555mm/month (Itraconazole: 0.558, Terbinafine: 0.600)
+        - Treatment advantage: mean 0.35mm/month (0.771mm difference over 12 months)
+        - Measurement error: overall standard deviation 4.39mm
         """
         logger.info("🤖 Using Mock LLM for prior elicitation...")
         logger.info(f"  Context: {clinical_context}")
         logger.info(f"  Comparison: {treatment_2} vs {treatment_1}")
         logger.info(f"  Outcome: {outcome_measure}")
         
-        # Study2歴史的データ + 実測データに基づく臨床的に合理的な事前分布
+        # Clinically reasonable priors based on Study2 historical data + actual measurements
         mock_priors = [
             LLMPriorSpecification(
                 parameter="baseline_intercept",
                 distribution="normal",
-                mean=2.5,  # Study2歴史的想定値（実測1.89mmより保守的）
-                std=1.0,   # 適度な不確実性を表現
+                mean=2.5,  # Study2 historical assumption (more conservative than actual 1.89mm)
+                std=1.0,   # Express moderate uncertainty
                 confidence=0.80,
                 rationale="Historical Study2 baseline assumption (2.5mm) vs actual data mean (1.89mm). Conservative prior allows data to inform.",
                 llm_model=self.model,
@@ -307,8 +307,8 @@ class MockLLMPriorElicitor:
             LLMPriorSpecification(
                 parameter="time_effect",
                 distribution="normal", 
-                mean=0.6,   # Study2想定値、実測0.558mmに近い
-                std=0.2,    # 合理的な不確実性
+                mean=0.6,   # Study2 assumption, close to actual 0.558mm
+                std=0.2,    # Reasonable uncertainty
                 confidence=0.85,
                 rationale="Historical Study2 assumption (0.6mm/month) aligns with actual Itraconazole rate (0.558mm/month).",
                 llm_model=self.model,
@@ -318,8 +318,8 @@ class MockLLMPriorElicitor:
             LLMPriorSpecification(
                 parameter="treatment_advantage",
                 distribution="normal",
-                mean=0.0,   # Study2中性想定、実測では0.042mm/月差
-                std=0.15,   # 小さいが検出可能な効果を許容
+                mean=0.0,   # Study2 neutral assumption, actual data shows 0.042mm/month difference
+                std=0.15,   # Allow small but detectable effects
                 confidence=0.70,
                 rationale="Historical Study2 neutral assumption (0.0). Actual data shows 0.042mm/month advantage for Terbinafine.",
                 llm_model=self.model,
@@ -329,8 +329,8 @@ class MockLLMPriorElicitor:
             LLMPriorSpecification(
                 parameter="error_std",
                 distribution="normal",
-                mean=3.7,   # Study2歴史的想定（実測4.39mmより保守的）
-                std=0.8,    # 測定誤差の不確実性
+                mean=3.7,   # Study2 historical assumption (more conservative than actual 4.39mm)
+                std=0.8,    # Measurement error uncertainty
                 confidence=0.85,
                 rationale="Historical Study2 error assumption (3.7mm) vs actual data std (4.39mm). Prior informed by clinical experience.",
                 llm_model=self.model,
@@ -344,7 +344,7 @@ class MockLLMPriorElicitor:
     
     def export_priors_for_analysis(self, priors: List[LLMPriorSpecification]) -> Dict:
         """
-        ベイズ解析用の事前分布仕様をエクスポート（Mock版）
+        Export prior distribution specifications for Bayesian analysis (Mock version)
         """
         exported_priors = {}
         
@@ -382,7 +382,7 @@ class MockLLMPriorElicitor:
     
     def save_session_data(self, priors: List[LLMPriorSpecification], filename: Optional[str] = None) -> str:
         """
-        セッションデータの保存（Mock版）
+        Save session data (Mock version)
         """
         if filename is None:
             filename = f"mock_llm_priors_session_{self.session_id}.json"

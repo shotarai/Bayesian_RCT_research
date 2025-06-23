@@ -1,7 +1,7 @@
 # filepath: src/data_models.py
 """
 Data Models for Bayesian RCT Research
-ベイズRCT研究用のデータモデル
+Data models for Bayesian RCT research analysis
 """
 
 from dataclasses import dataclass
@@ -10,7 +10,7 @@ from typing import List, Dict
 
 @dataclass
 class LLMPriorSpecification:
-    """LLMから得られた事前分布の仕様"""
+    """Prior distribution specifications obtained from LLM"""
     parameter: str
     distribution: str
     mean: float
@@ -24,7 +24,7 @@ class LLMPriorSpecification:
 
 @dataclass
 class ConsistencyAnalysis:
-    """事前分布の一貫性解析結果"""
+    """Consistency analysis results for prior distributions"""
     parameter: str
     mean_values: List[float]
     std_values: List[float]
@@ -36,7 +36,7 @@ class ConsistencyAnalysis:
 
 @dataclass
 class PriorComparison:
-    """事前分布の比較結果"""
+    """Prior distribution comparison results"""
     parameter: str
     llm_prior: Dict
     historical_prior: Dict
@@ -47,7 +47,7 @@ class PriorComparison:
 
 @dataclass
 class SampleSizeComparison:
-    """サンプルサイズ比較結果"""
+    """Sample size comparison results"""
     prior_type: str
     effective_sample_size: float
     power: float
