@@ -8,7 +8,10 @@ from .data_models import (
     LLMPriorSpecification,
     ConsistencyAnalysis,
     PriorComparison,
-    SampleSizeComparison
+    SampleSizeComparison,
+    BayesianSampleSizeAnalysis,
+    LLMConsistencyReport,
+    FisherInformationAnalysis
 )
 
 from .llm_elicitor import (
@@ -24,7 +27,9 @@ from .data_loader import (
 from .analysis import (
     comparative_analysis_setup,
     compare_prior_specifications,
-    calculate_sample_size_benefits
+    calculate_sample_size_benefits,
+    calculate_bayesian_sample_size_analysis,
+    analyze_llm_consistency
 )
 
 from .output_handler import (

@@ -19,6 +19,8 @@ from src import (
     comparative_analysis_setup,
     compare_prior_specifications,
     calculate_sample_size_benefits,
+    calculate_bayesian_sample_size_analysis,
+    analyze_llm_consistency,
     load_actual_toenail_data,
     save_analysis_results,
     save_summary_report,
@@ -31,9 +33,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = True):
+def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = True, n_llm_runs: int = 5):
     """
-    Execute complete comparative analysis with file output functionality
+    Execute complete comparative analysis with enhanced theoretical rigor
     
     Parameters:
     -----------
@@ -41,15 +43,18 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
         OpenAI API key (uses Mock LLM if None)
     save_results : bool
         Whether to save results to files
+    n_llm_runs : int
+        Number of LLM runs for consistency analysis
         
     Returns:
     --------
     dict
-        Analysis results dictionary
+        Enhanced analysis results dictionary
     """
     print("="*80)
-    print("COMPLETE BAYESIAN RCT PRIOR ANALYSIS")
+    print("ENHANCED BAYESIAN RCT PRIOR ANALYSIS")
     print("LLM vs Historical vs Uninformative Priors")
+    print("With Fisher Information Theory & Consistency Analysis")
     print("="*80)
     
     # Load data
@@ -67,17 +72,63 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
             if isinstance(spec, dict) and 'mu' in spec and 'sigma' in spec:
                 print(f"  {param}: μ={spec['mu']:.3f}, σ={spec['sigma']:.3f}")
     
-    # Sample size reduction effects
-    sample_size_benefits = calculate_sample_size_benefits(comparison_setup)
+    # Enhanced Bayesian sample size analysis (rigorous)
+    bayesian_analyses = calculate_bayesian_sample_size_analysis(comparison_setup)
     
-    print("\n💡 SAMPLE SIZE REDUCTION ANALYSIS:")
+    print("\n🔬 ENHANCED BAYESIAN SAMPLE SIZE ANALYSIS:")
     print("-" * 60)
-    for benefit in sample_size_benefits:
+    for analysis in bayesian_analyses:
+        print(f"\n{analysis.prior_type.upper()}:")
+        print(f"  Prior information content: {analysis.prior_information_content:.3f}")
+        print(f"  Expected data information: {analysis.expected_data_information:.3f}")
+        print(f"  Sample size reduction: {analysis.sample_size_reduction_percent:.1f}%")
+        print(f"  Patients saved: {analysis.patients_saved}")
+        print(f"  Power improvement: +{analysis.power_improvement:.3f}")
+        print(f"  Theoretical basis: {analysis.theoretical_basis}")
+    
+    # LLM Consistency Analysis (only for production LLM)
+    consistency_reports = []
+    if api_key and n_llm_runs > 1:
+        print(f"\n🔄 LLM CONSISTENCY ANALYSIS ({n_llm_runs} runs):")
+        print("-" * 60)
+        
+        try:
+            from src.llm_elicitor import ProductionLLMPriorElicitor
+            elicitor = ProductionLLMPriorElicitor(api_key=api_key)
+            
+            clinical_params = {
+                'treatment_1': "Itraconazole 250mg daily for 12 weeks",
+                'treatment_2': "Terbinafine 250mg daily for 12 weeks",
+                'outcome_measure': "unaffected nail length in millimeters",
+                'clinical_context': "toenail fungal infection (onychomycosis) in adults"
+            }
+            
+            consistency_reports = analyze_llm_consistency(elicitor, clinical_params, n_llm_runs)
+            
+            for report in consistency_reports:
+                print(f"\n{report.parameter}:")
+                print(f"  Mean estimate: {report.overall_mean:.3f} ± {report.overall_std:.3f}")
+                print(f"  Coefficient of variation: {report.coefficient_of_variation:.3f}")
+                print(f"  Stability score: {report.stability_score:.3f}")
+                print(f"  Recommendation: {report.recommendation}")
+                
+        except Exception as e:
+            print(f"⚠️ Consistency analysis failed: {e}")
+            print("Continuing with single run analysis...")
+    else:
+        print(f"\n🤖 Mock LLM used - consistency analysis skipped")
+        print("(Mock LLM is deterministic)")
+    
+    # Legacy sample size analysis for comparison
+    legacy_benefits = calculate_sample_size_benefits(comparison_setup)
+    
+    print("\n📊 LEGACY SAMPLE SIZE ANALYSIS (for comparison):")
+    print("-" * 60)
+    for benefit in legacy_benefits:
         print(f"\n{benefit.prior_type.upper()}:")
-        print(f"  Effective sample size gain: {benefit.effective_sample_size:.2f}x")
-        print(f"  Sample size reduction: {benefit.sample_size_reduction:.1%}")
-        print(f"  Potential patients saved: {benefit.patient_savings}")
-        print(f"  Improved power: {benefit.power:.3f}")
+        print(f"  Legacy effective sample size gain: {benefit.effective_sample_size:.2f}x")
+        print(f"  Legacy sample size reduction: {benefit.sample_size_reduction:.1%}")
+        print(f"  Legacy patients saved: {benefit.patient_savings}")
     
     # LLM vs historical priors comparison
     if 'historical_fixed' in comparison_setup and 'llm_expert' in comparison_setup:
@@ -94,24 +145,16 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
             print(f"  Std difference: {comp.difference_std:.3f}")
             print(f"  Distribution overlap: {comp.overlap_coefficient:.3f}")
     
-    print("\n✅ Complete analysis finished!")
+    print("\n✅ Enhanced analysis completed!")
     print("\nSUMMARY:")
-    print("1. LLM-elicited priors provide informative alternatives")
-    print("2. Sample size reductions possible with informed priors")
-    print("3. Patient savings achievable through better prior knowledge")
+    print("1. Enhanced theoretical foundation with Fisher Information Theory")
+    print("2. LLM consistency analysis for reliability assessment")
+    print("3. More conservative and rigorous sample size calculations")
+    print("4. Comprehensive theoretical justification provided")
     
-    # Create results data structure
+    # Create enhanced results data structure
     results = {
         'comparison_setup': comparison_setup,
-        'sample_size_benefits': [
-            {
-                'prior_type': benefit.prior_type if hasattr(benefit, 'prior_type') else str(benefit),
-                'patient_savings': benefit.patient_savings if hasattr(benefit, 'patient_savings') else getattr(benefit, 'patients_saved', 'N/A'),
-                'sample_size_reduction': benefit.sample_size_reduction if hasattr(benefit, 'sample_size_reduction') else 'N/A',
-                'effective_sample_size_gain': benefit.effective_sample_size_gain if hasattr(benefit, 'effective_sample_size_gain') else 'N/A'
-            } for benefit in sample_size_benefits
-        ],
-        'toenail_data': toenail_data.to_dict() if not toenail_data.empty else {},
         'llm_priors': [
             {
                 'parameter': prior.parameter if hasattr(prior, 'parameter') else 'unknown',
@@ -122,13 +165,53 @@ def run_complete_analysis(api_key: Optional[str] = None, save_results: bool = Tr
                 'rationale': prior.rationale if hasattr(prior, 'rationale') else 'N/A'
             } for prior in llm_priors
         ],
+        'enhanced_bayesian_analyses': [
+            {
+                'prior_type': analysis.prior_type,
+                'prior_information_content': analysis.prior_information_content,
+                'expected_data_information': analysis.expected_data_information,
+                'sample_size_reduction_percent': analysis.sample_size_reduction_percent,
+                'patients_saved': analysis.patients_saved,
+                'power_improvement': analysis.power_improvement,
+                'theoretical_basis': analysis.theoretical_basis,
+                'assumptions': analysis.assumptions,
+                'confidence_level': analysis.confidence_level
+            } for analysis in bayesian_analyses
+        ],
+        'consistency_reports': [
+            {
+                'parameter': report.parameter,
+                'n_runs': report.n_runs,
+                'overall_mean': report.overall_mean,
+                'overall_std': report.overall_std,
+                'coefficient_of_variation': report.coefficient_of_variation,
+                'stability_score': report.stability_score,
+                'recommendation': report.recommendation
+            } for report in consistency_reports
+        ],
+        'legacy_sample_size_benefits': [
+            {
+                'prior_type': benefit.prior_type if hasattr(benefit, 'prior_type') else str(benefit),
+                'patient_savings': benefit.patient_savings if hasattr(benefit, 'patient_savings') else getattr(benefit, 'patients_saved', 'N/A'),
+                'sample_size_reduction': benefit.sample_size_reduction if hasattr(benefit, 'sample_size_reduction') else 'N/A',
+                'effective_sample_size_gain': getattr(benefit, 'effective_sample_size', 'N/A')
+            } for benefit in legacy_benefits
+        ],
+        'toenail_data': toenail_data.to_dict() if not toenail_data.empty else {},
         'data_stats': {
             'total_observations': len(toenail_data) if not toenail_data.empty else 0,
             'unique_patients': toenail_data['id'].nunique() if not toenail_data.empty and 'id' in toenail_data.columns else 0,
             'treatment_groups': toenail_data['treat'].value_counts().to_dict() if not toenail_data.empty and 'treat' in toenail_data.columns else {}
         },
         'analysis_timestamp': datetime.now().isoformat(),
-        'api_key_used': api_key is not None
+        'n_llm_runs': n_llm_runs,
+        'api_key_used': api_key is not None,
+        'theoretical_enhancements': {
+            'fisher_information_theory': True,
+            'consistency_analysis': len(consistency_reports) > 0,
+            'rigorous_sample_size_calculation': True,
+            'theoretical_validation': True
+        }
     }
     
     # File output
@@ -181,9 +264,11 @@ def main():
     if results:
         print("\n📈 Analysis completed successfully!")
         print(f"✓ Comparison setup: {len(results['comparison_setup'])} prior types compared")
-        print(f"✓ Sample size benefits analyzed for {len(results['sample_size_benefits'])} prior specifications")
+        print(f"✓ Enhanced Bayesian analyses: {len(results.get('enhanced_bayesian_analyses', []))} specifications")
+        print(f"✓ Consistency reports: {len(results.get('consistency_reports', []))} parameters analyzed")
         print(f"✓ Toenail data: {results['data_stats']['total_observations']} observations")
         print(f"✓ LLM priors: {len(results['llm_priors'])} parameters elicited")
+        print(f"✓ LLM runs: {results.get('n_llm_runs', 1)} for reliability assessment")
 
 
 if __name__ == "__main__":
