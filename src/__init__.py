@@ -39,6 +39,13 @@ from .output_handler import (
     create_output_directory_structure
 )
 
+from .posterior_predictive_evaluation import (
+    PosteriorPredictiveEvaluator,
+    PosteriorPredictiveResult,
+    BenchmarkingResult,
+    generate_synthetic_test_data
+)
+
 __all__ = [
     'LLMPriorSpecification',
     'ConsistencyAnalysis', 
@@ -54,5 +61,9 @@ __all__ = [
     'save_analysis_results',
     'save_summary_report',
     'save_prior_comparison_csv',
-    'create_output_directory_structure'
+    'create_output_directory_structure',
+    'PosteriorPredictiveEvaluator',
+    'PosteriorPredictiveResult',
+    'BenchmarkingResult',
+    'generate_synthetic_test_data'
 ]

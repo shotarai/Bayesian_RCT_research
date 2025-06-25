@@ -47,8 +47,9 @@ numpy==2.3.1
     # via contourpy
     # via matplotlib
     # via pandas
+    # via scipy
     # via seaborn
-openai==1.90.0
+openai==1.91.0
     # via bayesian-rct-research
 packaging==25.0
     # via matplotlib
@@ -66,10 +67,12 @@ pyparsing==3.2.3
 python-dateutil==2.9.0.post0
     # via matplotlib
     # via pandas
-python-dotenv==1.1.0
+python-dotenv==1.1.1
     # via bayesian-rct-research
 pytz==2025.2
     # via pandas
+scipy==1.16.0
+    # via bayesian-rct-research
 seaborn==0.13.2
     # via bayesian-rct-research
 six==1.17.0
